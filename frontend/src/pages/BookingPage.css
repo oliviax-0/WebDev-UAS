@@ -391,8 +391,29 @@
   color: #fff;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ==================== RESPONSIVE STYLES ==================== */
+
+/* Laptop (1024px - 1399px) */
+@media (max-width: 1399px) {
+  .booking-container {
+    max-width: 700px;
+  }
+}
+
+/* Tablet Landscape (768px - 1023px) */
+@media (max-width: 1023px) {
+  .booking-header {
+    padding: 16px 24px;
+  }
+
+  .booking-container {
+    max-width: 100%;
+    margin: 20px 24px;
+  }
+}
+
+/* Tablet Portrait (600px - 767px) */
+@media (max-width: 767px) {
   .booking-header {
     padding: 12px 16px;
     flex-direction: column;
@@ -400,21 +421,206 @@
     gap: 12px;
   }
 
+  .booking-header h1 {
+    font-size: 18px;
+  }
+
+  .back-button-header {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
   .booking-container {
     margin: 16px;
     padding: 20px;
+  }
+
+  .booking-container h2 {
+    font-size: 16px;
+  }
+
+  .flight-summary {
+    padding: 16px;
+  }
+
+  .summary-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .summary-item .value {
+    font-weight: 600;
   }
 
   .passenger-section {
     padding: 16px;
   }
 
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-group {
+    width: 100%;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 12px;
+    font-size: 14px;
+  }
+
   .booking-summary-card {
     padding: 16px;
+  }
+
+  .summary-row {
+    font-size: 14px;
   }
 
   .summary-row.total-row {
     margin: 12px -16px -16px;
     padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  .submit-booking-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
+}
+
+/* Mobile (max-width: 599px) */
+@media (max-width: 599px) {
+  .booking-header {
+    padding: 10px 12px;
+  }
+
+  .booking-header h1 {
+    font-size: 16px;
+  }
+
+  .back-button-header {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .booking-container {
+    margin: 12px;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .booking-container h2 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .flight-summary {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .summary-item {
+    padding: 6px 0;
+  }
+
+  .summary-item .label {
+    font-size: 12px;
+  }
+
+  .summary-item .value {
+    font-size: 13px;
+  }
+
+  .summary-item.highlight {
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .passenger-section {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .passenger-section h3 {
+    font-size: 14px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .add-passenger-btn {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .booking-summary-card {
+    padding: 12px;
+  }
+
+  .summary-row {
+    font-size: 13px;
+    padding: 8px 0;
+  }
+
+  .summary-row.total-row {
+    margin: 10px -12px -12px;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .submit-booking-btn {
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .back-button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Small Mobile (max-width: 374px) */
+@media (max-width: 374px) {
+  .booking-container {
+    margin: 8px;
+    padding: 12px;
+  }
+
+  .booking-header h1 {
+    font-size: 14px;
+  }
+
+  .flight-summary,
+  .passenger-section,
+  .booking-summary-card {
+    padding: 10px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .submit-booking-btn {
+    padding: 10px;
+    font-size: 13px;
   }
 }

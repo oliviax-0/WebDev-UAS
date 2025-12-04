@@ -1216,40 +1216,370 @@ textarea {
   }
 }
 
-@media (max-width: 480px) {
+/* ==================== RESPONSIVE STYLES ==================== */
+
+/* Large Desktop (1400px and up) */
+@media (min-width: 1400px) {
+  .search-section {
+    padding: 60px 80px;
+  }
+
+  .search-card {
+    max-width: 1200px;
+    padding: 48px;
+  }
+
+  .section-container {
+    max-width: 1400px;
+  }
+}
+
+/* Laptop (1024px - 1399px) */
+@media (max-width: 1399px) {
+  .search-section {
+    padding: 40px;
+  }
+
+  .search-card {
+    max-width: 900px;
+    padding: 32px;
+  }
+}
+
+/* Tablet Landscape (768px - 1023px) */
+@media (max-width: 1023px) {
   .header {
-    padding: 12px;
+    padding: 0 24px;
+  }
+
+  .nav-menu {
+    margin-left: 20px;
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .search-section {
+    padding: 32px 24px;
+  }
+
+  .search-card {
+    padding: 24px;
+  }
+
+  .search-form-modern {
+    gap: 16px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .location-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .swap-button-inline {
+    transform: rotate(90deg);
+    margin: 8px auto;
+  }
+
+  .date-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .destinations-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet Portrait (600px - 767px) */
+@media (max-width: 767px) {
+  .header {
+    padding: 0 16px;
+    height: 56px;
   }
 
   .logo-text {
     font-size: 18px;
   }
 
-  .nav-link {
-    padding: 6px 12px;
+  .nav-menu {
+    display: none;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+
+  .search-section {
+    padding: 24px 16px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+  }
+
+  .search-card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .trip-type-toggle {
+    gap: 8px;
+  }
+
+  .trip-type-btn {
+    padding: 10px 20px;
     font-size: 13px;
   }
 
   .search-form-modern {
-    padding: 16px;
+    gap: 12px;
   }
 
   .location-input,
   .date-input {
-    padding: 16px;
-    font-size: 14px;
+    padding: 14px;
+  }
+
+  .input-icon {
+    font-size: 18px;
+  }
+
+  .passenger-dropdown-toggle {
+    padding: 14px;
+  }
+
+  .search-button {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .destinations-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .destination-card {
+    height: 160px;
+  }
+
+  .destination-name {
+    font-size: 16px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-card {
+    padding: 20px;
   }
 
   .section-title-wrapper h2 {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .footer-container {
     grid-template-columns: 1fr;
-    padding: 32px 20px 20px;
+    padding: 32px 16px;
+    gap: 24px;
   }
 
   .footer-brand-section {
     grid-column: span 1;
+  }
+
+  .payment-partners {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile (max-width: 599px) */
+@media (max-width: 599px) {
+  .header {
+    padding: 0 12px;
+    height: 52px;
+  }
+
+  .logo-icon {
+    font-size: 20px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+  }
+
+  .search-section {
+    padding: 20px 12px;
+  }
+
+  .hero-title {
+    font-size: 22px;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .search-card {
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .trip-type-toggle {
+    width: 100%;
+  }
+
+  .trip-type-btn {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+
+  .passenger-dropdown-toggle {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .location-input,
+  .date-input {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .location-input::placeholder,
+  .date-input::placeholder {
+    font-size: 13px;
+  }
+
+  .search-button {
+    padding: 14px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .destinations-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .destination-card {
+    height: 140px;
+  }
+
+  .destination-name {
+    font-size: 14px;
+  }
+
+  .destination-country {
+    font-size: 11px;
+  }
+
+  .section-container {
+    padding: 32px 12px;
+  }
+
+  .section-title-wrapper h2 {
+    font-size: 18px;
+  }
+
+  .section-title-wrapper p {
+    font-size: 13px;
+  }
+
+  .feature-card {
+    padding: 16px;
+  }
+
+  .feature-icon {
+    font-size: 28px;
+  }
+
+  .feature-card h3 {
+    font-size: 14px;
+  }
+
+  .feature-card p {
+    font-size: 12px;
+  }
+
+  .passenger-dropdown {
+    width: calc(100vw - 32px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Suggestions dropdown */
+  .airport-suggestions {
+    max-height: 200px;
+  }
+
+  .suggestion-item {
+    padding: 10px 12px;
+  }
+
+  .airport-code {
+    font-size: 12px;
+  }
+
+  .airport-name {
+    font-size: 13px;
+  }
+
+  .airport-city {
+    font-size: 11px;
+  }
+}
+
+/* Small Mobile (max-width: 374px) */
+@media (max-width: 374px) {
+  .header {
+    padding: 0 8px;
+  }
+
+  .logo-text {
+    font-size: 14px;
+  }
+
+  .search-card {
+    padding: 12px;
+  }
+
+  .trip-type-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .location-input,
+  .date-input {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .destinations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .destination-card {
+    height: 120px;
   }
 }
