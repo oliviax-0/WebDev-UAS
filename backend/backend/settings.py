@@ -123,17 +123,8 @@ STATIC_URL = 'static/'
 # CORS Settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite default port
-    "http://localhost:3000",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# CORS Settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite default port
+    "http://localhost:5174",  # Vite alternative port
+    "http://localhost:5175",  # Vite alternative port
     "http://localhost:3000",
 ]
 

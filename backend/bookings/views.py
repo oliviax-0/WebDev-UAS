@@ -91,6 +91,124 @@ def get_airline_name(code):
     return AIRLINE_NAMES.get(code, code)
 
 @api_view(['GET'])
+def search_airports(request):
+    """
+    Search for airports using Amadeus API
+    Parameters: keyword (city name, airport name, or IATA code)
+    """
+    try:
+        keyword = request.GET.get('keyword', '').strip()
+        
+        if not keyword or len(keyword) < 2:
+            return Response({
+                'success': False,
+                'error': 'Please enter at least 2 characters'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Use Amadeus Airport & City Search API
+        response = amadeus.reference_data.locations.get(
+            keyword=keyword,
+            subType='AIRPORT,CITY'
+        )
+        
+        airports = []
+        for location in response.data:
+            airport_data = {
+                'code': location.get('iataCode', ''),
+                'name': location.get('name', ''),
+                'city': location.get('address', {}).get('cityName', ''),
+                'country': location.get('address', {}).get('countryName', ''),
+                'type': location.get('subType', '')
+            }
+            
+            # Only include results with IATA code
+            if airport_data['code']:
+                airports.append(airport_data)
+        
+        return Response({
+            'success': True,
+            'airports': airports  # Return all results (no limit)
+        })
+        
+    except ResponseError as error:
+        return Response({
+            'success': False,
+            'error': 'Failed to search airports',
+            'details': str(error)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': 'An error occurred while searching airports',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def get_popular_destinations(request):
+    """
+    Get popular travel destinations using Amadeus API
+    Returns most traveled destinations based on flight search analytics
+    """
+    try:
+        # Use Amadeus Travel Recommendations API
+        response = amadeus.reference_data.recommended_locations.get()
+        
+        destinations = []
+        for location in response.data[:8]:  # Limit to 8 destinations
+            dest_data = {
+                'code': location.get('iataCode', ''),
+                'name': location.get('name', ''),
+                'city': location.get('address', {}).get('cityName', ''),
+                'country': location.get('address', {}).get('countryName', ''),
+                'type': location.get('type', ''),
+                'relevance': location.get('relevance', 0)
+            }
+            
+            if dest_data['code']:
+                destinations.append(dest_data)
+        
+        # If API doesn't return data, provide fallback popular destinations
+        if not destinations:
+            destinations = [
+                {'code': 'PAR', 'city': 'Paris', 'country': 'France', 'name': 'Paris', 'image': 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&q=80'},
+                {'code': 'LON', 'city': 'London', 'country': 'United Kingdom', 'name': 'London', 'image': 'https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=800&q=80'},
+                {'code': 'NYC', 'city': 'New York', 'country': 'United States', 'name': 'New York', 'image': 'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=800&q=80'},
+                {'code': 'DXB', 'city': 'Dubai', 'country': 'United Arab Emirates', 'name': 'Dubai', 'image': 'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800&q=80'},
+                {'code': 'TYO', 'city': 'Tokyo', 'country': 'Japan', 'name': 'Tokyo', 'image': 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&q=80'},
+                {'code': 'BKK', 'city': 'Bangkok', 'country': 'Thailand', 'name': 'Bangkok', 'image': 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80'},
+                {'code': 'SIN', 'city': 'Singapore', 'country': 'Singapore', 'name': 'Singapore', 'image': 'https://images.unsplash.com/photo-1508964942454-1a56651d54ac?w=800&q=80'},
+                {'code': 'IST', 'city': 'Istanbul', 'country': 'Turkey', 'name': 'Istanbul', 'image': 'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800&q=80'}
+            ]
+        
+        return Response({
+            'success': True,
+            'destinations': destinations
+        })
+        
+    except ResponseError as error:
+        # Return fallback destinations on API error
+        fallback_destinations = [
+            {'code': 'PAR', 'city': 'Paris', 'country': 'France', 'name': 'Paris', 'image': 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&q=80'},
+            {'code': 'LON', 'city': 'London', 'country': 'United Kingdom', 'name': 'London', 'image': 'https://images.unsplash.com/photo-1505761671935-60b3a7427bad?w=800&q=80'},
+            {'code': 'NYC', 'city': 'New York', 'country': 'United States', 'name': 'New York', 'image': 'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=800&q=80'},
+            {'code': 'DXB', 'city': 'Dubai', 'country': 'United Arab Emirates', 'name': 'Dubai', 'image': 'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800&q=80'},
+            {'code': 'TYO', 'city': 'Tokyo', 'country': 'Japan', 'name': 'Tokyo', 'image': 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&q=80'},
+            {'code': 'BKK', 'city': 'Bangkok', 'country': 'Thailand', 'name': 'Bangkok', 'image': 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80'},
+            {'code': 'SIN', 'city': 'Singapore', 'country': 'Singapore', 'name': 'Singapore', 'image': 'https://images.unsplash.com/photo-1508964942454-1a56651d54ac?w=800&q=80'},
+            {'code': 'IST', 'city': 'Istanbul', 'country': 'Turkey', 'name': 'Istanbul', 'image': 'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800&q=80'}
+        ]
+        return Response({
+            'success': True,
+            'destinations': fallback_destinations
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': 'An error occurred while fetching popular destinations',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
 def search_flights(request):
     """
     Search for flights using Amadeus API
@@ -103,10 +221,16 @@ def search_flights(request):
         return_date = request.GET.get('return_date')
         adults = request.GET.get('adults', 1)
         
+        print(f"Search request: {origin} -> {destination}, Date: {departure_date}, Adults: {adults}")
+        
         # Validate required parameters
         if not all([origin, destination, departure_date]):
             return Response(
-                {'error': 'Missing required parameters: origin, destination, departure_date'},
+                {
+                    'success': False,
+                    'error': 'Missing required parameters: origin, destination, departure_date',
+                    'details': f'Received - origin: {origin}, destination: {destination}, departure_date: {departure_date}'
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -123,7 +247,11 @@ def search_flights(request):
         if return_date:
             search_params['returnDate'] = return_date
         
+        print(f"Calling Amadeus API with params: {search_params}")
+        
         response = amadeus.shopping.flight_offers_search.get(**search_params)
+        
+        print(f"Amadeus API returned {len(response.data)} offers")
         
         # Format the response for frontend
         flights = []
@@ -171,6 +299,8 @@ def search_flights(request):
                 }
                 flights.append(flight_info)
         
+        print(f"Returning {len(flights)} formatted flights")
+        
         return Response({
             'success': True,
             'flights': flights,
@@ -178,13 +308,27 @@ def search_flights(request):
         })
         
     except ResponseError as error:
+        error_message = str(error)
+        error_details = error.description if hasattr(error, 'description') else 'Amadeus API error'
+        print(f"Amadeus API Error: {error_message} - {error_details}")
         return Response(
-            {'error': str(error), 'details': error.description if hasattr(error, 'description') else 'Amadeus API error'},
+            {
+                'success': False,
+                'error': error_message,
+                'details': error_details
+            },
             status=status.HTTP_400_BAD_REQUEST
         )
     except Exception as e:
+        print(f"Unexpected error: {type(e).__name__} - {str(e)}")
+        import traceback
+        traceback.print_exc()
         return Response(
-            {'error': 'An error occurred', 'details': str(e)},
+            {
+                'success': False,
+                'error': 'An error occurred',
+                'details': str(e)
+            },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 

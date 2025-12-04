@@ -1,63 +1,106 @@
 .results-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 40px 20px;
+  background: url("https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1920&q=80")
+    center/cover no-repeat;
+  background-attachment: fixed;
+  position: relative;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
 }
 
-.results-container {
-  max-width: 1000px;
-  margin: 0 auto;
+.results-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.7) 0%,
+    rgba(118, 75, 162, 0.7) 100%
+  );
+  z-index: 0;
+}
+
+.results-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .results-header {
-  background: white;
-  border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 20px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  border-radius: 0;
 }
 
 .results-header h1 {
-  color: #333;
-  margin: 0 0 10px 0;
+  color: #667eea;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .results-header p {
   color: #666;
-  margin: 0 0 20px 0;
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.results-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
 .back-button-small {
-  background: #667eea;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  padding: 12px 24px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  transition: background 0.3s;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .back-button-small:hover {
-  background: #5568d3;
+  background: #667eea;
+  color: white;
+  transform: translateX(-5px);
 }
 
 .back-button {
-  background: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   padding: 15px 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  transition: background 0.3s;
+  transition: all 0.3s;
   margin-top: 20px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .back-button:hover {
-  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .flights-list {
@@ -67,16 +110,19 @@
 }
 
 .flight-card {
-  background: white;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s, box-shadow 0.3s;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .flight-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .flight-header {
@@ -208,17 +254,132 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 15px;
+  padding: 16px;
   font-size: 16px;
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .select-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.select-button:disabled {
+  background: linear-gradient(135deg, #ccc 0%, #999 100%);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.selected-flight-banner {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 25px 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.selected-flight-banner > div {
+  flex: 1;
+  min-width: 250px;
+}
+
+.selected-flight-banner strong {
+  font-size: 18px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.change-flight-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.change-flight-button:hover {
+  background: white;
+  color: #10b981;
+  transform: translateX(-5px);
+}
+
+.selected-flight-banner h3 {
+  margin: 0 0 15px 0;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.selected-flight-banner h3::before {
+  content: "✓";
+  background: white;
+  color: #10b981;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.selected-flight-banner p {
+  margin: 5px 0;
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+.change-flight-button {
+  background: white;
+  color: #10b981;
+  border: 2px solid white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.change-flight-button:hover {
+  background: #f0fdf4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.return-flights-section {
+  margin-top: 40px;
+}
+
+.section-title {
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
