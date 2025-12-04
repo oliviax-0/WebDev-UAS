@@ -110,9 +110,41 @@ function BookingPage() {
         );
 
         if (responses.every((res) => res.data.success)) {
+          // Save to localStorage for MyTrips page
+          const bookingId = `BK${Date.now()}`;
+          const tripData = {
+            bookingId,
+            tripType: "round-trip",
+            departure_airport: departureFlight.departure_airport,
+            arrival_airport: departureFlight.arrival_airport,
+            departure_time: departureFlight.departure_time,
+            arrival_time: departureFlight.arrival_time,
+            airline_code: departureFlight.airline_code,
+            airline_name: departureFlight.airline_name,
+            totalPrice:
+              parseFloat(departureFlight.price) +
+              parseFloat(returnFlight.price),
+            currency: departureFlight.currency,
+            passengers: formData.passengers.length,
+            passengerNames: formData.passengers.map((p) => p.passengerName),
+            bookedAt: new Date().toISOString(),
+            returnFlight: {
+              departure_airport: returnFlight.departure_airport,
+              arrival_airport: returnFlight.arrival_airport,
+              departure_time: returnFlight.departure_time,
+              arrival_time: returnFlight.arrival_time,
+            },
+          };
+
+          const existingTrips = JSON.parse(
+            localStorage.getItem("myTrips") || "[]"
+          );
+          existingTrips.push(tripData);
+          localStorage.setItem("myTrips", JSON.stringify(existingTrips));
+
           setSuccess(true);
           setTimeout(() => {
-            navigate("/");
+            navigate("/my-trips");
           }, 3000);
         }
       } else {
@@ -137,9 +169,34 @@ function BookingPage() {
         );
 
         if (responses.every((res) => res.data.success)) {
+          // Save to localStorage for MyTrips page
+          const bookingId = `BK${Date.now()}`;
+          const tripData = {
+            bookingId,
+            tripType: searchParams?.tripType || "one-way",
+            departure_airport: singleFlight.departure_airport,
+            arrival_airport: singleFlight.arrival_airport,
+            departure_time: singleFlight.departure_time,
+            arrival_time: singleFlight.arrival_time,
+            airline_code: singleFlight.airline_code,
+            airline_name: singleFlight.airline_name,
+            totalPrice:
+              parseFloat(singleFlight.price) * formData.passengers.length,
+            currency: singleFlight.currency,
+            passengers: formData.passengers.length,
+            passengerNames: formData.passengers.map((p) => p.passengerName),
+            bookedAt: new Date().toISOString(),
+          };
+
+          const existingTrips = JSON.parse(
+            localStorage.getItem("myTrips") || "[]"
+          );
+          existingTrips.push(tripData);
+          localStorage.setItem("myTrips", JSON.stringify(existingTrips));
+
           setSuccess(true);
           setTimeout(() => {
-            navigate("/");
+            navigate("/my-trips");
           }, 3000);
         }
       }

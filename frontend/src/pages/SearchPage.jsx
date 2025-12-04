@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import DatePicker from "react-datepicker";
@@ -13,9 +13,13 @@ function SearchPage() {
     departureDate: null,
     returnDate: null,
     tripType: "round-trip",
-    passengers: 2,
+    adults: 1,
+    children: 0,
+    infants: 0,
     travelClass: "Economy",
   });
+  const [originDisplay, setOriginDisplay] = useState("");
+  const [destinationDisplay, setDestinationDisplay] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [datePrices, setDatePrices] = useState({});
@@ -27,6 +31,22 @@ function SearchPage() {
   const [searchingOrigin, setSearchingOrigin] = useState(false);
   const [searchingDestination, setSearchingDestination] = useState(false);
   const [popularDestinations, setPopularDestinations] = useState([]);
+  const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
+  const passengerDropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        passengerDropdownRef.current &&
+        !passengerDropdownRef.current.contains(event.target)
+      ) {
+        setShowPassengerDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Fetch popular destinations on component mount
   useEffect(() => {
@@ -79,11 +99,18 @@ function SearchPage() {
 
   const handleOriginChange = async (e) => {
     const value = e.target.value;
-    setFormData((prev) => ({ ...prev, origin: value }));
+    setOriginDisplay(value);
+
+    // Extract code if user is typing, otherwise use the value as-is for search
+    // If the value contains parentheses (like "Jakarta (CGK)"), extract just what's typed
+    const searchValue = value.includes("(")
+      ? value.split("(")[0].trim()
+      : value;
+    setFormData((prev) => ({ ...prev, origin: searchValue.toUpperCase() }));
 
     if (value.length >= 2) {
       setSearchingOrigin(true);
-      const suggestions = await searchAirports(value);
+      const suggestions = await searchAirports(searchValue);
       setOriginSuggestions(suggestions);
       setShowOriginSuggestions(true);
       setSearchingOrigin(false);
@@ -94,11 +121,20 @@ function SearchPage() {
 
   const handleDestinationChange = async (e) => {
     const value = e.target.value;
-    setFormData((prev) => ({ ...prev, destination: value }));
+    setDestinationDisplay(value);
+
+    // Extract code if user is typing, otherwise use the value as-is for search
+    const searchValue = value.includes("(")
+      ? value.split("(")[0].trim()
+      : value;
+    setFormData((prev) => ({
+      ...prev,
+      destination: searchValue.toUpperCase(),
+    }));
 
     if (value.length >= 2) {
       setSearchingDestination(true);
-      const suggestions = await searchAirports(value);
+      const suggestions = await searchAirports(searchValue);
       setDestinationSuggestions(suggestions);
       setShowDestinationSuggestions(true);
       setSearchingDestination(false);
@@ -108,12 +144,16 @@ function SearchPage() {
   };
 
   const selectOrigin = (airport) => {
+    const displayText = `${airport.city} (${airport.code})`;
     setFormData((prev) => ({ ...prev, origin: airport.code }));
+    setOriginDisplay(displayText);
     setShowOriginSuggestions(false);
   };
 
   const selectDestination = (airport) => {
+    const displayText = `${airport.city} (${airport.code})`;
     setFormData((prev) => ({ ...prev, destination: airport.code }));
+    setDestinationDisplay(displayText);
     setShowDestinationSuggestions(false);
   };
 
@@ -140,6 +180,10 @@ function SearchPage() {
       origin: prev.destination,
       destination: prev.origin,
     }));
+    // Swap display names too
+    const tempDisplay = originDisplay;
+    setOriginDisplay(destinationDisplay);
+    setDestinationDisplay(tempDisplay);
   };
 
   // Format dates to YYYY-MM-DD
@@ -189,7 +233,7 @@ function SearchPage() {
             ? formData.origin.toUpperCase()
             : formData.destination.toUpperCase(),
           departure_date: dateStr,
-          adults: formData.passengers,
+          adults: formData.adults,
         };
 
         const response = await axios.get("http://localhost:8000/api/search/", {
@@ -240,7 +284,7 @@ function SearchPage() {
           origin: formData.origin.toUpperCase(),
           destination: formData.destination.toUpperCase(),
           departure_date: formatDate(formData.departureDate),
-          adults: formData.passengers,
+          adults: formData.adults,
         };
 
         // Search return flights
@@ -248,7 +292,7 @@ function SearchPage() {
           origin: formData.destination.toUpperCase(),
           destination: formData.origin.toUpperCase(),
           departure_date: formatDate(formData.returnDate),
-          adults: formData.passengers,
+          adults: formData.adults,
         };
 
         const [departureResponse, returnResponse] = await Promise.all([
@@ -277,7 +321,7 @@ function SearchPage() {
           origin: formData.origin.toUpperCase(),
           destination: formData.destination.toUpperCase(),
           departure_date: formatDate(formData.departureDate),
-          adults: formData.passengers,
+          adults: formData.adults,
         };
 
         const response = await axios.get("http://localhost:8000/api/search/", {
@@ -310,23 +354,44 @@ function SearchPage() {
   return (
     <div className="search-page">
       <header className="header">
-        <div className="logo">FlyHigh</div>
+        <div className="header-left">
+          <div className="logo">
+            <span className="logo-icon">✈</span>
+            <span className="logo-text">SkyBooker</span>
+          </div>
+        </div>
         <nav className="nav-menu">
-          <a href="#" className="nav-link">
-            Flight Schedule
+          <a href="#" className="nav-link active">
+            <span className="nav-icon">🛫</span>
+            Flights
           </a>
-          <a href="#" className="nav-link">
-            Manage Booking
+          <a
+            href="#"
+            className="nav-link"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/my-trips");
+            }}
+          >
+            <span className="nav-icon">📋</span>
+            My Trips
           </a>
         </nav>
+        <div className="header-right">
+          <button className="login-btn">Sign In</button>
+        </div>
       </header>
 
       <div className="hero-section">
         <div className="hero-content">
+          <p className="hero-tagline">Search, Compare & Book</p>
           <h1 className="hero-title">
-            Hey Buddy! where are you <span className="flying-text">Flying</span>{" "}
-            to?
+            Find Your Perfect <span className="flying-text">Flight</span>
           </h1>
+          <p className="hero-subtitle">
+            Compare prices from 100+ airlines and travel agents to get the best
+            deals
+          </p>
         </div>
 
         <div className="search-card">
@@ -351,40 +416,203 @@ function SearchPage() {
             </button>
 
             <div className="trip-details">
-              <div className="detail-item">
-                <span className="detail-icon">👤</span>
-                <select
-                  value={formData.passengers}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      passengers: parseInt(e.target.value),
-                    })
+              <div className="passenger-selector" ref={passengerDropdownRef}>
+                <button
+                  type="button"
+                  className="passenger-trigger"
+                  onClick={() =>
+                    setShowPassengerDropdown(!showPassengerDropdown)
                   }
-                  className="detail-select"
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                    <option key={num} value={num}>
-                      {num < 10 && "0"}
-                      {num} Passenger{num > 1 ? "s" : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <span className="passenger-icon">👤</span>
+                  <span className="passenger-text">
+                    {formData.adults + formData.children + formData.infants}{" "}
+                    Passenger
+                    {formData.adults + formData.children + formData.infants > 1
+                      ? "s"
+                      : ""}
+                    , {formData.travelClass}
+                  </span>
+                  <span className="dropdown-arrow">▼</span>
+                </button>
 
-              <div className="detail-item">
-                <span className="detail-icon">💺</span>
-                <select
-                  value={formData.travelClass}
-                  onChange={(e) =>
-                    setFormData({ ...formData, travelClass: e.target.value })
-                  }
-                  className="detail-select"
-                >
-                  <option value="Economy">Economy Class</option>
-                  <option value="Business">Business Class</option>
-                  <option value="First">First Class</option>
-                </select>
+                {showPassengerDropdown && (
+                  <div className="passenger-dropdown">
+                    <div className="passenger-row">
+                      <button
+                        type="button"
+                        className="counter-btn"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            adults: Math.max(1, prev.adults - 1),
+                          }))
+                        }
+                        disabled={formData.adults <= 1}
+                      >
+                        −
+                      </button>
+                      <div className="passenger-info">
+                        <span className="passenger-count">
+                          {formData.adults}
+                        </span>
+                        <span className="passenger-label">
+                          Adult (12yrs and above)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="counter-btn"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            adults: Math.min(9, prev.adults + 1),
+                          }))
+                        }
+                        disabled={formData.adults >= 9}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <div className="passenger-row">
+                      <button
+                        type="button"
+                        className="counter-btn"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            children: Math.max(0, prev.children - 1),
+                          }))
+                        }
+                        disabled={formData.children <= 0}
+                      >
+                        −
+                      </button>
+                      <div className="passenger-info">
+                        <span className="passenger-count">
+                          {formData.children}
+                        </span>
+                        <span className="passenger-label">
+                          Children (2-11yrs)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="counter-btn"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            children: Math.min(9, prev.children + 1),
+                          }))
+                        }
+                        disabled={formData.children >= 9}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <div className="passenger-row">
+                      <button
+                        type="button"
+                        className="counter-btn"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            infants: Math.max(0, prev.infants - 1),
+                          }))
+                        }
+                        disabled={formData.infants <= 0}
+                      >
+                        −
+                      </button>
+                      <div className="passenger-info">
+                        <span className="passenger-count">
+                          {formData.infants}
+                        </span>
+                        <span className="passenger-label">
+                          Infants (below 2yrs)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="counter-btn"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            infants: Math.min(9, prev.infants + 1),
+                          }))
+                        }
+                        disabled={formData.infants >= 9}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <div className="cabin-class-section">
+                      <div className="cabin-class-grid">
+                        <button
+                          type="button"
+                          className={`cabin-btn ${
+                            formData.travelClass === "Economy" ? "active" : ""
+                          }`}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              travelClass: "Economy",
+                            }))
+                          }
+                        >
+                          Economy
+                        </button>
+                        <button
+                          type="button"
+                          className={`cabin-btn ${
+                            formData.travelClass === "Premium Economy"
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              travelClass: "Premium Economy",
+                            }))
+                          }
+                        >
+                          Premium economy
+                        </button>
+                        <button
+                          type="button"
+                          className={`cabin-btn ${
+                            formData.travelClass === "Business" ? "active" : ""
+                          }`}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              travelClass: "Business",
+                            }))
+                          }
+                        >
+                          Business
+                        </button>
+                        <button
+                          type="button"
+                          className={`cabin-btn ${
+                            formData.travelClass === "First" ? "active" : ""
+                          }`}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              travelClass: "First",
+                            }))
+                          }
+                        >
+                          First
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -394,13 +622,14 @@ function SearchPage() {
               <div className="input-wrapper from-input">
                 <label className="input-label">FROM</label>
                 <div className="location-display">
+                  <span className="location-icon">✈</span>
                   <input
                     type="text"
                     name="origin"
-                    value={formData.origin}
+                    value={originDisplay}
                     onChange={handleOriginChange}
                     onFocus={() =>
-                      formData.origin.length >= 2 &&
+                      originDisplay.length >= 2 &&
                       setShowOriginSuggestions(true)
                     }
                     placeholder="City or Airport (e.g., Paris, JFK, London)"
@@ -418,9 +647,9 @@ function SearchPage() {
                   )}
                   {showOriginSuggestions && originSuggestions.length > 0 && (
                     <div className="airport-suggestions">
-                      {originSuggestions.map((airport) => (
+                      {originSuggestions.map((airport, idx) => (
                         <div
-                          key={airport.code}
+                          key={`origin-${airport.code}-${idx}`}
                           className="suggestion-item"
                           onClick={() => selectOrigin(airport)}
                         >
@@ -453,13 +682,14 @@ function SearchPage() {
               <div className="input-wrapper to-input">
                 <label className="input-label">TO</label>
                 <div className="location-display">
+                  <span className="location-icon">📍</span>
                   <input
                     type="text"
                     name="destination"
-                    value={formData.destination}
+                    value={destinationDisplay}
                     onChange={handleDestinationChange}
                     onFocus={() =>
-                      formData.destination.length >= 2 &&
+                      destinationDisplay.length >= 2 &&
                       setShowDestinationSuggestions(true)
                     }
                     placeholder="City or Airport (e.g., Tokyo, CDG, Dubai)"
@@ -478,9 +708,9 @@ function SearchPage() {
                   {showDestinationSuggestions &&
                     destinationSuggestions.length > 0 && (
                       <div className="airport-suggestions">
-                        {destinationSuggestions.map((airport) => (
+                        {destinationSuggestions.map((airport, idx) => (
                           <div
-                            key={airport.code}
+                            key={`dest-${airport.code}-${idx}`}
                             className="suggestion-item"
                             onClick={() => selectDestination(airport)}
                           >
@@ -646,10 +876,15 @@ function SearchPage() {
 
         <div className="popular-destinations">
           <div className="section-header">
-            <h2>Popular Destinations</h2>
-            <p className="section-subtitle">
-              Discover the world's most visited cities
-            </p>
+            <div className="section-title-wrapper">
+              <h2>🌍 Trending Destinations</h2>
+              <p className="section-subtitle">
+                Explore our most popular flight routes this month
+              </p>
+            </div>
+            <a href="#" className="view-all-link">
+              View all destinations →
+            </a>
           </div>
           <div className="destinations-grid">
             {popularDestinations.map((destination, index) => (
@@ -662,17 +897,163 @@ function SearchPage() {
                   <div className="destination-image">
                     <img src={destination.image} alt={destination.city} />
                     <div className="destination-overlay"></div>
+                    <div className="destination-badge">Popular</div>
                   </div>
                 )}
                 <div className="destination-content">
-                  <h3 className="destination-city">{destination.city}</h3>
-                  <p className="destination-country">{destination.country}</p>
-                  <div className="destination-code">{destination.code}</div>
+                  <div className="destination-info">
+                    <h3 className="destination-city">{destination.city}</h3>
+                    <p className="destination-country">{destination.country}</p>
+                  </div>
+                  <div className="destination-action">
+                    <span className="destination-code">{destination.code}</span>
+                    <span className="destination-arrow">→</span>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Features Section */}
+        <div className="features-section">
+          <div className="feature-card">
+            <div className="feature-icon">💰</div>
+            <h3>Best Price Guarantee</h3>
+            <p>Find a lower price? We'll refund the difference</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🔒</div>
+            <h3>Secure Booking</h3>
+            <p>Your data is protected with industry-standard encryption</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">⚡</div>
+            <h3>Instant Confirmation</h3>
+            <p>Get your e-ticket delivered to your inbox immediately</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🎧</div>
+            <h3>24/7 Support</h3>
+            <p>Our travel experts are here to help anytime</p>
+          </div>
+        </div>
+
+        {/* Footer - Traveloka Style */}
+        <footer className="site-footer">
+          <div className="footer-container">
+            {/* Logo & Partners Section */}
+            <div className="footer-section footer-brand-section">
+              <div className="footer-logo">
+                <span className="logo-icon">✈</span>
+                <span className="logo-text">SkyBooker</span>
+              </div>
+              <div className="partner-badges">
+                <span className="badge">IATA Member</span>
+                <span className="badge">Verified</span>
+              </div>
+
+              <h4 className="footer-title">Payment Partners</h4>
+              <div className="payment-partners">
+                <div className="payment-icon">💳 Visa</div>
+                <div className="payment-icon">💳 Mastercard</div>
+                <div className="payment-icon">💳 JCB</div>
+                <div className="payment-icon">💳 BCA</div>
+                <div className="payment-icon">💳 Mandiri</div>
+                <div className="payment-icon">💳 BNI</div>
+                <div className="payment-icon">💳 GoPay</div>
+                <div className="payment-icon">💳 OVO</div>
+              </div>
+            </div>
+
+            {/* About Section */}
+            <div className="footer-section">
+              <h4 className="footer-title">About SkyBooker</h4>
+              <ul className="footer-links">
+                <li>
+                  <a href="#">How to Book</a>
+                </li>
+                <li>
+                  <a href="#">Contact Us</a>
+                </li>
+                <li>
+                  <a href="#">Help Center</a>
+                </li>
+                <li>
+                  <a href="#">Careers</a>
+                </li>
+                <li>
+                  <a href="#">About Us</a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Products Section */}
+            <div className="footer-section">
+              <h4 className="footer-title">Products</h4>
+              <ul className="footer-links">
+                <li>
+                  <a href="#">Flights</a>
+                </li>
+                <li>
+                  <a href="#">Airport Transfer</a>
+                </li>
+                <li>
+                  <a href="#">Travel Insurance</a>
+                </li>
+                <li>
+                  <a href="#">Gift Voucher</a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Others Section */}
+            <div className="footer-section">
+              <h4 className="footer-title">Others</h4>
+              <ul className="footer-links">
+                <li>
+                  <a href="#">Privacy Notice</a>
+                </li>
+                <li>
+                  <a href="#">Terms & Conditions</a>
+                </li>
+                <li>
+                  <a href="#">Refund Policy</a>
+                </li>
+                <li>
+                  <a href="#">Blog</a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Follow Us Section */}
+            <div className="footer-section">
+              <h4 className="footer-title">Follow us on</h4>
+              <div className="social-links">
+                <a href="#" className="social-link">
+                  <span>📘</span> Facebook
+                </a>
+                <a href="#" className="social-link">
+                  <span>📸</span> Instagram
+                </a>
+                <a href="#" className="social-link">
+                  <span>🎵</span> TikTok
+                </a>
+                <a href="#" className="social-link">
+                  <span>▶️</span> Youtube
+                </a>
+                <a href="#" className="social-link">
+                  <span>✖️</span> Twitter
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="footer-bottom">
+            <p>© 2025 SkyBooker. All rights reserved.</p>
+          </div>
+        </footer>
       </div>
     </div>
   );

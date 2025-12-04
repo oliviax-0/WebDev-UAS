@@ -125,10 +125,32 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite default port
     "http://localhost:5174",  # Vite alternative port
     "http://localhost:5175",  # Vite alternative port
+    "http://localhost:5176",  # Vite alternative port
     "http://localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Session Settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 86400 * 7  # 7 days
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:5176",
+    "http://localhost:3000",
+]
+
+# REST Framework Settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

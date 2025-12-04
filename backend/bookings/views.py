@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,10 +14,7 @@ from decimal import Decimal
 amadeus = Client(
     client_id='OmrWfxumvmvLZhsFrGrdVmDFf5tBAgJM',
     client_secret='tU6y1Nsr3iRCPGWv'
-    # hostname='test' is default - limited data
-    # For production: hostname='production' - requires paid subscription
 )
-
 # Airline code to name mapping
 AIRLINE_NAMES = {
     'AA': 'American Airlines',
